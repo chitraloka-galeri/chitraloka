@@ -1,0 +1,720 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Chitraloka — Dunia Lukisan</title>
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet"/>
+  <style>
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+    :root {
+      --ink: #0f0e0c;
+      --cream: #f5f0e8;
+      --rust: #c94a1f;
+      --gold: #d4a843;
+      --muted: #7a7570;
+      --paper: #faf7f2;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      background: var(--paper);
+      color: var(--ink);
+      font-family: 'DM Sans', sans-serif;
+      overflow-x: hidden;
+      cursor: none;
+    }
+
+    /* Custom cursor */
+    .cursor {
+      width: 12px; height: 12px;
+      background: var(--rust);
+      border-radius: 50%;
+      position: fixed;
+      top: 0; left: 0;
+      pointer-events: none;
+      z-index: 9999;
+      transition: transform 0.15s ease, width 0.2s, height 0.2s;
+      transform: translate(-50%, -50%);
+    }
+    .cursor-ring {
+      width: 36px; height: 36px;
+      border: 1.5px solid var(--rust);
+      border-radius: 50%;
+      position: fixed;
+      top: 0; left: 0;
+      pointer-events: none;
+      z-index: 9998;
+      transform: translate(-50%, -50%);
+      transition: left 0.08s ease, top 0.08s ease;
+      opacity: 0.5;
+    }
+
+    /* NAV */
+    nav {
+      position: fixed; top: 0; left: 0; right: 0;
+      z-index: 100;
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 1.4rem 3rem;
+      mix-blend-mode: multiply;
+    }
+    .nav-logo {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 1.6rem;
+      letter-spacing: 0.12em;
+      color: var(--ink);
+      text-decoration: none;
+    }
+    .nav-logo span { color: var(--rust); }
+    .nav-links {
+      display: flex; gap: 2.5rem;
+      list-style: none;
+    }
+    .nav-links a {
+      font-size: 0.78rem;
+      font-weight: 500;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      color: var(--ink);
+      text-decoration: none;
+      opacity: 0.7;
+      transition: opacity 0.2s;
+    }
+    .nav-links a:hover { opacity: 1; }
+
+    /* HERO */
+    .hero {
+      min-height: 100vh;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .hero-left {
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-end;
+      padding: 10rem 3rem 5rem;
+      position: relative;
+      z-index: 2;
+    }
+
+    .hero-eyebrow {
+      font-size: 0.72rem;
+      letter-spacing: 0.25em;
+      text-transform: uppercase;
+      color: var(--rust);
+      font-weight: 500;
+      margin-bottom: 1.5rem;
+      opacity: 0;
+      animation: fadeUp 0.8s ease 0.2s forwards;
+    }
+
+    .hero-title {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: clamp(5rem, 10vw, 9rem);
+      line-height: 0.9;
+      letter-spacing: 0.02em;
+      color: var(--ink);
+      opacity: 0;
+      animation: fadeUp 0.9s ease 0.4s forwards;
+    }
+    .hero-title em {
+      font-family: 'DM Serif Display', serif;
+      font-style: italic;
+      color: var(--rust);
+    }
+
+    .hero-sub {
+      margin-top: 2rem;
+      font-size: 1rem;
+      color: var(--muted);
+      line-height: 1.7;
+      max-width: 380px;
+      font-weight: 300;
+      opacity: 0;
+      animation: fadeUp 0.9s ease 0.6s forwards;
+    }
+
+    .hero-cta {
+      margin-top: 3rem;
+      display: flex; gap: 1rem; flex-wrap: wrap;
+      opacity: 0;
+      animation: fadeUp 0.9s ease 0.8s forwards;
+    }
+
+    .btn-primary {
+      background: var(--rust);
+      color: white;
+      padding: 1rem 2.2rem;
+      font-size: 0.8rem;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      font-weight: 500;
+      border: none;
+      cursor: none;
+      text-decoration: none;
+      transition: background 0.25s, transform 0.2s;
+      display: inline-block;
+    }
+    .btn-primary:hover { background: #a83a12; transform: translateY(-2px); }
+
+    .btn-secondary {
+      background: transparent;
+      color: var(--ink);
+      padding: 1rem 2.2rem;
+      font-size: 0.8rem;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      font-weight: 500;
+      border: 1.5px solid var(--ink);
+      cursor: none;
+      text-decoration: none;
+      transition: background 0.25s, color 0.25s;
+      display: inline-block;
+    }
+    .btn-secondary:hover { background: var(--ink); color: var(--paper); }
+
+    .hero-right {
+      position: relative;
+      overflow: hidden;
+      background: var(--cream);
+    }
+
+    .hero-canvas-grid {
+      position: absolute; inset: 0;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      grid-template-rows: 1fr 1fr 1fr;
+      gap: 3px;
+      padding: 80px 0 0 3px;
+      opacity: 0;
+      animation: fadeIn 1.2s ease 0.5s forwards;
+    }
+
+    .canvas-block {
+      background: var(--ink);
+      position: relative;
+      overflow: hidden;
+      transition: transform 0.4s ease;
+    }
+    .canvas-block:hover { transform: scale(1.02); z-index: 2; }
+
+    .canvas-block:nth-child(1) { background: #2b2018; }
+    .canvas-block:nth-child(2) { background: #c94a1f; grid-row: span 2; }
+    .canvas-block:nth-child(3) { background: #d4a843; }
+    .canvas-block:nth-child(4) { background: #1a2634; grid-column: span 2; }
+
+    .canvas-label {
+      position: absolute;
+      bottom: 1rem; left: 1rem;
+      font-size: 0.65rem;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: rgba(255,255,255,0.5);
+      font-weight: 500;
+    }
+
+    /* Abstract shapes on canvas blocks */
+    .canvas-block::before {
+      content: '';
+      position: absolute;
+      width: 60%; height: 60%;
+      border-radius: 50%;
+      opacity: 0.15;
+      top: 20%; left: 20%;
+    }
+    .canvas-block:nth-child(1)::before { background: #d4a843; }
+    .canvas-block:nth-child(2)::before { background: white; width: 40%; height: 70%; border-radius: 0; top: 15%; left: 30%; transform: rotate(15deg); }
+    .canvas-block:nth-child(3)::before { background: #c94a1f; width: 80%; height: 80%; top: 10%; left: -10%; border-radius: 0; transform: rotate(-20deg); }
+    .canvas-block:nth-child(4)::before { background: #d4a843; width: 30%; height: 200%; border-radius: 0; top: -50%; left: 40%; transform: rotate(25deg); }
+
+    /* TICKER */
+    .ticker {
+      background: var(--ink);
+      color: var(--cream);
+      padding: 0.85rem 0;
+      overflow: hidden;
+      white-space: nowrap;
+    }
+    .ticker-track {
+      display: inline-flex;
+      animation: ticker 20s linear infinite;
+    }
+    .ticker-item {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 1rem;
+      letter-spacing: 0.15em;
+      padding: 0 3rem;
+    }
+    .ticker-item span { color: var(--rust); }
+
+    /* MISI SECTION */
+    .section-misi {
+      display: grid;
+      grid-template-columns: 1fr 1.4fr;
+      gap: 0;
+      min-height: 70vh;
+    }
+
+    .misi-left {
+      background: var(--rust);
+      padding: 6rem 4rem;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+    }
+
+    .section-label {
+      font-size: 0.7rem;
+      letter-spacing: 0.25em;
+      text-transform: uppercase;
+      font-weight: 500;
+      margin-bottom: 1.5rem;
+    }
+
+    .misi-left .section-label { color: rgba(255,255,255,0.6); }
+
+    .misi-heading {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: clamp(3.5rem, 6vw, 5.5rem);
+      line-height: 0.95;
+      color: white;
+      letter-spacing: 0.02em;
+    }
+    .misi-heading em {
+      font-family: 'DM Serif Display', serif;
+      font-style: italic;
+      color: var(--gold);
+    }
+
+    .misi-right {
+      padding: 6rem 5rem;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      background: var(--cream);
+    }
+
+    .misi-right .section-label { color: var(--muted); }
+
+    .misi-statement {
+      font-family: 'DM Serif Display', serif;
+      font-size: clamp(1.3rem, 2.2vw, 1.8rem);
+      line-height: 1.5;
+      color: var(--ink);
+      margin-bottom: 2rem;
+      font-style: italic;
+    }
+
+    .misi-body {
+      font-size: 0.9rem;
+      line-height: 1.85;
+      color: var(--muted);
+      max-width: 480px;
+    }
+
+    .misi-values {
+      margin-top: 3rem;
+      display: flex;
+      flex-direction: column;
+      gap: 1.2rem;
+    }
+
+    .value-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 1.2rem;
+    }
+
+    .value-num {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 2rem;
+      color: var(--rust);
+      line-height: 1;
+      min-width: 2rem;
+    }
+
+    .value-text strong {
+      display: block;
+      font-size: 0.8rem;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      font-weight: 500;
+      margin-bottom: 0.3rem;
+    }
+
+    .value-text p {
+      font-size: 0.82rem;
+      color: var(--muted);
+      line-height: 1.6;
+    }
+
+    /* SUBMIT SECTION */
+    .section-submit {
+      background: var(--ink);
+      padding: 8rem 3rem;
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .section-submit::before {
+      content: 'SUBMIT';
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 20vw;
+      position: absolute;
+      top: 50%; left: 50%;
+      transform: translate(-50%, -50%);
+      color: rgba(255,255,255,0.03);
+      letter-spacing: 0.1em;
+      white-space: nowrap;
+      pointer-events: none;
+    }
+
+    .submit-label {
+      font-size: 0.72rem;
+      letter-spacing: 0.25em;
+      text-transform: uppercase;
+      color: var(--rust);
+      font-weight: 500;
+      margin-bottom: 1.5rem;
+    }
+
+    .submit-heading {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: clamp(3.5rem, 8vw, 7rem);
+      color: white;
+      line-height: 0.9;
+      letter-spacing: 0.03em;
+      margin-bottom: 0.5rem;
+    }
+    .submit-heading em {
+      font-family: 'DM Serif Display', serif;
+      font-style: italic;
+      color: var(--gold);
+    }
+
+    .submit-sub {
+      font-size: 0.95rem;
+      color: rgba(255,255,255,0.45);
+      margin: 2rem auto;
+      max-width: 480px;
+      line-height: 1.8;
+    }
+
+    .submit-steps {
+      display: flex;
+      justify-content: center;
+      gap: 0;
+      margin: 3.5rem auto;
+      max-width: 700px;
+      position: relative;
+    }
+
+    .submit-steps::before {
+      content: '';
+      position: absolute;
+      top: 1.5rem; left: 10%; right: 10%;
+      height: 1px;
+      background: rgba(255,255,255,0.1);
+    }
+
+    .step {
+      flex: 1;
+      text-align: center;
+      padding: 0 1rem;
+      position: relative;
+    }
+
+    .step-dot {
+      width: 3rem; height: 3rem;
+      border: 1.5px solid var(--rust);
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      margin: 0 auto 1rem;
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 1.1rem;
+      color: var(--rust);
+      background: var(--ink);
+      position: relative;
+      z-index: 1;
+    }
+
+    .step-title {
+      font-size: 0.72rem;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: rgba(255,255,255,0.6);
+      font-weight: 500;
+    }
+
+    .submit-cta {
+      margin-top: 1rem;
+    }
+
+    .btn-large {
+      background: var(--rust);
+      color: white;
+      padding: 1.3rem 3.5rem;
+      font-size: 0.85rem;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      font-weight: 500;
+      border: none;
+      cursor: none;
+      text-decoration: none;
+      display: inline-block;
+      transition: background 0.25s, transform 0.2s;
+    }
+    .btn-large:hover { background: #a83a12; transform: translateY(-3px); }
+
+    .submit-note {
+      margin-top: 1.5rem;
+      font-size: 0.75rem;
+      color: rgba(255,255,255,0.25);
+      letter-spacing: 0.05em;
+    }
+
+    /* FOOTER */
+    footer {
+      background: var(--cream);
+      padding: 3rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-top: 1px solid rgba(0,0,0,0.08);
+    }
+
+    .footer-logo {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 1.4rem;
+      letter-spacing: 0.12em;
+      color: var(--ink);
+    }
+    .footer-logo span { color: var(--rust); }
+
+    .footer-tagline {
+      font-size: 0.75rem;
+      color: var(--muted);
+      letter-spacing: 0.1em;
+      font-style: italic;
+    }
+
+    .footer-copy {
+      font-size: 0.72rem;
+      color: var(--muted);
+      letter-spacing: 0.08em;
+    }
+
+    /* ANIMATIONS */
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(30px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to   { opacity: 1; }
+    }
+    @keyframes ticker {
+      from { transform: translateX(0); }
+      to   { transform: translateX(-50%); }
+    }
+
+    /* SCROLL REVEAL */
+    .reveal {
+      opacity: 0;
+      transform: translateY(40px);
+      transition: opacity 0.8s ease, transform 0.8s ease;
+    }
+    .reveal.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  </style>
+</head>
+<body>
+
+  <div class="cursor" id="cursor"></div>
+  <div class="cursor-ring" id="cursorRing"></div>
+
+  <!-- NAV -->
+  <nav>
+    <a href="#" class="nav-logo">CHITRA<span>LOKA</span></a>
+    <ul class="nav-links">
+      <li><a href="#">Galeri</a></li>
+      <li><a href="#">Seniman</a></li>
+      <li><a href="#">Tentang</a></li>
+      <li><a href="#">Submit Karya</a></li>
+    </ul>
+  </nav>
+
+  <!-- HERO -->
+  <section class="hero">
+    <div class="hero-left">
+      <p class="hero-eyebrow">Galeri Digital Terbuka · Open Digital Gallery</p>
+      <h1 class="hero-title">
+        DUNIA<br>
+        <em>LUKISAN</em><br>
+        KITA
+      </h1>
+      <p class="hero-sub">
+        Ruang digital untuk semua — dari tangan anak-anak hingga seniman dewasa. 
+        Tidak ada kurasi yang menghalangi. Hanya karya, dan dunia yang melihatnya.
+        <br><br>
+        <em style="font-size:0.85rem; color: #999;">A digital space for all — no gatekeeping, only art and its audience.</em>
+      </p>
+      <div class="hero-cta">
+        <a href="#submit" class="btn-primary">Bagikan Karyamu &rarr;</a>
+        <a href="#galeri" class="btn-secondary">Jelajahi Galeri</a>
+      </div>
+    </div>
+    <div class="hero-right">
+      <div class="hero-canvas-grid">
+        <div class="canvas-block"><span class="canvas-label">Abstrak · 2024</span></div>
+        <div class="canvas-block"><span class="canvas-label">Ekspresif · 2024</span></div>
+        <div class="canvas-block"><span class="canvas-label">Figuratif · 2024</span></div>
+        <div class="canvas-block"><span class="canvas-label">Lansekap · 2024</span></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- TICKER -->
+  <div class="ticker">
+    <div class="ticker-track">
+      <span class="ticker-item">CHITRALOKA</span>
+      <span class="ticker-item"><span>✦</span> TERBUKA UNTUK SEMUA USIA</span>
+      <span class="ticker-item">OPEN FOR ALL AGES</span>
+      <span class="ticker-item"><span>✦</span> TANPA KURASI</span>
+      <span class="ticker-item">NO GATEKEEPING</span>
+      <span class="ticker-item"><span>✦</span> DUNIA LUKISAN KITA</span>
+      <span class="ticker-item">THE WORLD OF OUR ART</span>
+      <span class="ticker-item"><span>✦</span> CHITRALOKA</span>
+      <span class="ticker-item"><span>✦</span> TERBUKA UNTUK SEMUA USIA</span>
+      <span class="ticker-item">OPEN FOR ALL AGES</span>
+      <span class="ticker-item"><span>✦</span> TANPA KURASI</span>
+      <span class="ticker-item">NO GATEKEEPING</span>
+      <span class="ticker-item"><span>✦</span> DUNIA LUKISAN KITA</span>
+      <span class="ticker-item">THE WORLD OF OUR ART</span>
+      <span class="ticker-item"><span>✦</span></span>
+    </div>
+  </div>
+
+  <!-- MISI -->
+  <section class="section-misi" id="misi">
+    <div class="misi-left reveal">
+      <p class="section-label">Misi · Mission</p>
+      <h2 class="misi-heading">
+        SENI<br>
+        BUKAN<br>
+        MILIK<br>
+        <em>Segelintir</em>
+      </h2>
+    </div>
+    <div class="misi-right reveal">
+      <p class="section-label">Nilai Kami · Our Values</p>
+      <p class="misi-statement">
+        "Setiap karya layak dilihat dunia, tanpa syarat, tanpa seleksi."
+      </p>
+      <p class="misi-body">
+        Chitraloka hadir sebagai ruang apresiasi digital yang merangkul semua — dari anak usia dini 
+        yang baru pertama kali memegang kuas, hingga seniman dewasa yang belum mendapat panggung. 
+        Kami percaya visibilitas adalah hak, bukan hadiah.
+      </p>
+      <div class="misi-values">
+        <div class="value-item">
+          <div class="value-num">01</div>
+          <div class="value-text">
+            <strong>Terbuka · Open</strong>
+            <p>Tidak ada batas usia, latar belakang, atau gaya melukis. Semua diterima.</p>
+          </div>
+        </div>
+        <div class="value-item">
+          <div class="value-num">02</div>
+          <div class="value-text">
+            <strong>Gratis · Free</strong>
+            <p>Akses tanpa biaya untuk seniman maupun pengunjung, selamanya.</p>
+          </div>
+        </div>
+        <div class="value-item">
+          <div class="value-num">03</div>
+          <div class="value-text">
+            <strong>Nyata · Visible</strong>
+            <p>Karya yang tersembunyi di laci berhak tampil di ruang publik digital.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- SUBMIT -->
+  <section class="section-submit" id="submit">
+    <p class="submit-label reveal">Bagikan Karyamu · Share Your Art</p>
+    <h2 class="submit-heading reveal">
+      KARYAMU<br>
+      <em>Pantas</em><br>
+      DILIHAT
+    </h2>
+    <p class="submit-sub reveal">
+      Proses mudah, tanpa seleksi panjang. Cukup tiga langkah, 
+      dan lukisanmu hadir di hadapan dunia.
+      <br><em style="font-size:0.85em">Simple process, no lengthy curation — just three steps to go public.</em>
+    </p>
+
+    <div class="submit-steps reveal">
+      <div class="step">
+        <div class="step-dot">01</div>
+        <div class="step-title">Isi Formulir<br>Fill the Form</div>
+      </div>
+      <div class="step">
+        <div class="step-dot">02</div>
+        <div class="step-title">Upload Karya<br>Upload Artwork</div>
+      </div>
+      <div class="step">
+        <div class="step-dot">03</div>
+        <div class="step-title">Tampil di Galeri<br>Go Live</div>
+      </div>
+    </div>
+
+    <div class="submit-cta reveal">
+      <a href="#" class="btn-large">Mulai Sekarang · Start Now &rarr;</a>
+      <p class="submit-note">Terbuka untuk semua usia · Gratis selamanya · Open to all ages · Always free</p>
+    </div>
+  </section>
+
+  <!-- FOOTER -->
+  <footer>
+    <div>
+      <div class="footer-logo">CHITRA<span>LOKA</span></div>
+      <p class="footer-tagline">Dunia Lukisan · The World of Painting</p>
+    </div>
+    <p class="footer-copy">© 2024 Chitraloka · Semua karya milik seniman masing-masing</p>
+  </footer>
+
+  <script>
+    // Custom cursor
+    const cursor = document.getElementById('cursor');
+    const cursorRing = document.getElementById('cursorRing');
+    document.addEventListener('mousemove', e => {
+      cursor.style.left = e.clientX + 'px';
+      cursor.style.top = e.clientY + 'px';
+      setTimeout(() => {
+        cursorRing.style.left = e.clientX + 'px';
+        cursorRing.style.top = e.clientY + 'px';
+      }, 80);
+    });
+
+    // Scroll reveal
+    const reveals = document.querySelectorAll('.reveal');
+    const observer = new IntersectionObserver(entries => {
+      entries.forEach(e => {
+        if (e.isIntersecting) { e.target.classList.add('visible'); }
+      });
+    }, { threshold: 0.15 });
+    reveals.forEach(r => observer.observe(r));
+  </script>
+</body>
+</html>
